@@ -17,3 +17,13 @@ const personSchema = new mongoose.Schema({
 })
 
 const Person = mongoose.model('Person', personSchema)
+
+const person = new Person({
+name: 'meow',
+number: 4875639876,
+})
+
+person.save().then(result => {
+    console.log('MEOW')
+    mongoose.connection.close()
+})

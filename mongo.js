@@ -7,8 +7,7 @@ if (process.argv.length < 3) {
 
 const password = process.argv[2]
 
-const url = `mongodb+srv://meowmeow:${password}@phonebook.rtlohf3.mongodb.net/?appName=phonebook`
-
+const url = `mongodb+srv://meowmeow:${password}@meow.aylzfms.mongodb.net/?appName=meow`
 mongoose.connect(url, { family: 4 })
 
 const personSchema = new mongoose.Schema({

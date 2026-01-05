@@ -1,3 +1,6 @@
+require('dotenv').config()
+const Person = require('./models/person')
+
 const express = require('express')
 const app = express()
 app.use(express.json())
@@ -33,18 +36,21 @@ let persons = [
 ]
 
 app.get('/api/persons', (req, res) => {
-    res.json(persons)
+  Person.find({}).then(persons => {
+  res.json(persons)
+  }) 
 })
 
 app.get('/api/persons/:id', (req, res) => {
   const id = req.params.id
-  const person = persons.find(p => p.id === id)
-  if (person) {
+  Person.findById(id).then(person => {
+if (person) {
     res.json(person)
   }
   else {
     res.status(404).end()
   }
+  })
 })
 
 app.get('/info', (req, res) => {
@@ -79,27 +85,35 @@ app.post('/api/persons', (req, res) => {
     })
   }
 
-  if (persons.some(p => p.name === body.name)) {
+  Person.findOne({name: body.name}).then(person => {
+    if (person) {
     return res.status(400).json({
       error: 'name already exists in phonebook'
-    })
-  }
-
-  const generatedId = Math.floor(Math.random() * 1000)
-  const person = {
-    id: generatedId,
+    })}
+   else {
+   const person = new Person({
     name: body.name,
     number: body.number
-  }
-
-  persons = persons.concat(person)
-  res.json(person)
-  
+  })
+  person.save().then(savedPerson => {
+  res.json(savedPerson)
+  })
+   }
 })
+
+})
+
 app.delete('/api/persons/:id', (req, res) => {
   const id = req.params.id
-  persons = persons.filter(p => p.id !== id)
+  Person.deleteOne({_id: id}).then(response => {console.log(response)
+try { if (response.deletedCount > 0) {
   res.status(204).end()
+}}
+catch (err) {
+  return res.status(400).json({
+      error: err.message
+    })
+}})
 })
 const PORT = process.env.PORT || 3001
 app.listen(PORT)

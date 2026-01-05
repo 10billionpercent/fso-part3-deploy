@@ -8,6 +8,8 @@ if (process.argv.length < 3) {
 const password = process.argv[2]
 const name = process.argv[3]
 const number = process.argv[4]
+const name = process.argv[3]
+const number = process.argv[4]
 
 const url = `mongodb+srv://meowmeow:${password}@meow.aylzfms.mongodb.net/?appName=meow`
 mongoose.connect(url, { family: 4 })
@@ -22,10 +24,14 @@ const Person = mongoose.model('Person', personSchema)
 const person = new Person({
 name: name,
 number: number,
+name: name,
+number: number,
 })
 
 if (process.argv.length > 3) {
+if (process.argv.length > 3) {
 person.save().then(result => {
+    console.log(`Added ${name} number ${number} to phonebook`)
     console.log(`Added ${name} number ${number} to phonebook`)
     mongoose.connection.close()
 })

@@ -44,7 +44,7 @@ app.get('/info', (req, res) => {
   })
 })
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
   const body = req.body
 
     if (!body) {
@@ -71,7 +71,7 @@ app.post('/api/persons', (req, res) => {
   person.save().then(savedPerson => {
   res.json(savedPerson)
   })
-
+.catch(err => next(err))
 })
 
 app.put('/api/persons/:id', (req, res, next) => {
@@ -105,15 +105,18 @@ const unknownEndpoint = (req, res) => {
 
 app.use(unknownEndpoint)
 
-const castErrorHandler = (err, req, res, next) => {
+const errorHandler = (err, req, res, next) => {
   console.log(err.message)
   if (err.name === 'CastError') {
     return res.status(400).send({error: 'malformatted id'})
   }
+  else if (err.name === 'ValidationError') {
+    return res.status(400).send({error: err.message})
+  }
   next(err)
 }
 
-app.use(castErrorHandler)
+app.use(errorHandler)
 
 const unknownErrorHandler = (err, req, res, next) => {
 console.log(err.message)

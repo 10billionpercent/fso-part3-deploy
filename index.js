@@ -32,7 +32,8 @@ if (person) {
 })
 
 app.get('/info', (req, res) => {
-      res.send(`
+  Person.find({}).then(persons => { 
+       res.send(`
         <body style ="
         background-color: black;
         color: white">
@@ -40,6 +41,7 @@ app.get('/info', (req, res) => {
         <p> ${new Date()} </p>
         </body>
         `)
+  })
 })
 
 app.post('/api/persons', (req, res) => {

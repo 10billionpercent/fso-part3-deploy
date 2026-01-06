@@ -28,6 +28,10 @@ if (person) {
     res.status(404).end()
   }
   })
+  .catch(err => {
+    console.log(err)
+    res.status(500).end()
+  })
 })
 
 app.get('/info', (req, res) => {
@@ -82,15 +86,14 @@ app.post('/api/persons', (req, res) => {
 
 app.delete('/api/persons/:id', (req, res) => {
   const id = req.params.id
-  Person.deleteOne({_id: id}).then(response => {console.log(response)
-try { if (response.deletedCount > 0) {
+  Person.findByIdAndDelete(id).then(result => {
   res.status(204).end()
-}}
-catch (err) {
+})
+.catch(err => {
   return res.status(400).json({
       error: err.message
     })
-}})
+})
 })
 const PORT = process.env.PORT || 3001
 app.listen(PORT)

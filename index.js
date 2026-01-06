@@ -18,7 +18,7 @@ app.get('/api/persons', (req, res) => {
   }) 
 })
 
-app.get('/api/persons/:id', (req, res) => {
+app.get('/api/persons/:id', (req, res, next) => {
   const id = req.params.id
   Person.findById(id).then(person => {
 if (person) {
@@ -28,10 +28,7 @@ if (person) {
     res.status(404).end()
   }
   })
-  .catch(err => {
-    console.log(err)
-    res.status(500).end()
-  })
+  .catch(err => next(err))
 })
 
 app.get('/info', (req, res) => {
@@ -84,16 +81,35 @@ app.post('/api/persons', (req, res) => {
 
 })
 
-app.delete('/api/persons/:id', (req, res) => {
+app.delete('/api/persons/:id', (req, res, next) => {
   const id = req.params.id
   Person.findByIdAndDelete(id).then(result => {
   res.status(204).end()
 })
-.catch(err => {
-  return res.status(400).json({
-      error: err.message
-    })
+.catch(err => next(err))
 })
-})
+
+const unknownEndpoint = (req, res) => {
+  res.status(404).send({error: 'unknown endpoint'})
+}
+
+app.use(unknownEndpoint)
+
+const castErrorHandler = (err, req, res, next) => {
+  console.log(err.message)
+  if (err.name === 'CastError') {
+    return res.status(400).send({error: 'malformatted id'})
+  }
+  next(err)
+}
+
+app.use(castErrorHandler)
+
+const unknownErrorHandler = (err, req, res, next) => {
+console.log(err.message)
+return res.status(500).send({error: 'internal server error'})
+}
+
+app.use(unknownErrorHandler)
 const PORT = process.env.PORT || 3001
 app.listen(PORT)
